@@ -287,9 +287,9 @@ func (l *BBR) Allow() (ratelimit.DoneFunc, error) {
 		return nil, ratelimit.ErrLimitExceed
 	}
 	atomic.AddInt64(&l.inFlight, 1)
-	start := time.Now().UnixNano()
+	start := time.Now()
 	return func(ratelimit.DoneInfo) {
-		rt := (time.Now().UnixNano() - start) / int64(time.Millisecond)
+		rt := int64(time.Since(start)) / int64(time.Millisecond)
 		l.rtStat.Add(rt)
 		atomic.AddInt64(&l.inFlight, -1)
 		l.passStat.Add(1)

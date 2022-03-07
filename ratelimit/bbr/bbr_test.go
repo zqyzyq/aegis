@@ -122,6 +122,19 @@ func TestBBRMinRt(t *testing.T) {
 	assert.Equal(t, int64(1), bbr.minRT())
 }
 
+func BenchmarkBBRMinRt(b *testing.B) {
+	bbr := NewLimiter(optsForTest...)
+	b.RunParallel(func(pb *testing.PB) {
+		for pb.Next() {
+			start := time.Now()
+			bbr.rtStat.Add(int64(time.Since(start)))
+			// panic: stat/metric: cannot decrease in value.
+			// start := time.Now().UnixNano()
+			// bbr.rtStat.Add(time.Now().UnixNano() - start)
+		}
+	})
+}
+
 func TestBBRMinRtWithCache(t *testing.T) {
 	bucketDuration := windowSizeTest / time.Duration(bucketNumTest)
 	bbr := NewLimiter(optsForTest...)
